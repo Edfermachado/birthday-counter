@@ -17,40 +17,55 @@ export default function BirthdayCounter({ name, birthDate }: BirthdayCounterProp
 
   function calculateTimeLeft() {
     const now = new Date();
+    
+    // Obtener año actual
     const currentYear = now.getFullYear();
     
-    // Crear fecha de cumpleaños para este año
+    // Crear fecha de cumpleaños para ESTE AÑO en la zona horaria local
     let nextBirthday = new Date(
       currentYear,
       birthDate.getMonth(),
-      birthDate.getDate()
+      birthDate.getDate(),
+      0, 0, 0, 0  // Medianoche
     );
     
-    // Si ya pasó este año, usar el próximo año
+    // Si el cumpleaños YA PASÓ este año, usar el próximo año
     if (now > nextBirthday) {
-      nextBirthday.setFullYear(currentYear + 1);
+      nextBirthday = new Date(
+        currentYear + 1,
+        birthDate.getMonth(),
+        birthDate.getDate(),
+        0, 0, 0, 0
+      );
     }
     
+    // Calcular diferencia en milisegundos
     const difference = nextBirthday.getTime() - now.getTime();
     
+    // Si la diferencia es positiva (aún no es el cumpleaños)
     if (difference > 0) {
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+      
       return {
-        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-        minutes: Math.floor((difference / 1000 / 60) % 60),
-        seconds: Math.floor((difference / 1000) % 60),
-        nextBirthday: nextBirthday,
+        days,
+        hours,
+        minutes,
+        seconds,
+        nextBirthday,
         isToday: false,
       };
     }
     
-    // Si es el día del cumpleaños
+    // Si la diferencia es <= 0, es HOY el cumpleaños
     return {
       days: 0,
       hours: 0,
       minutes: 0,
       seconds: 0,
-      nextBirthday: nextBirthday,
+      nextBirthday,
       isToday: true,
     };
   }
@@ -86,6 +101,13 @@ export default function BirthdayCounter({ name, birthDate }: BirthdayCounterProp
     );
   }
 
+  // Calcular fecha para mostrar (sin horas/minutos/segundos)
+  const displayDate = new Date(
+    timeLeft.nextBirthday.getFullYear(),
+    timeLeft.nextBirthday.getMonth(),
+    timeLeft.nextBirthday.getDate()
+  );
+
   return (
     <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-10 mb-8">
       <div className="text-center mb-8">
@@ -102,7 +124,10 @@ export default function BirthdayCounter({ name, birthDate }: BirthdayCounterProp
           )}
         </h2>
         <p className="text-lg text-gray-600 mt-2">
-          {formatDate(timeLeft.nextBirthday)}
+          {formatDate(displayDate)}
+        </p>
+        <p className="text-sm text-gray-500 mt-2">
+          Zona horaria: {Intl.DateTimeFormat().resolvedOptions().timeZone}
         </p>
       </div>
 
@@ -129,7 +154,11 @@ export default function BirthdayCounter({ name, birthDate }: BirthdayCounterProp
             <div className="text-center">
               <div className="inline-block bg-gradient-to-r from-blue-100 to-purple-100 rounded-full px-6 py-3">
                 <p className="text-lg text-gray-700">
-                  <span className="font-semibold">Faltan {timeLeft.days} días</span> para celebrar
+                  {timeLeft.days === 1 ? (
+                    <span className="font-semibold">¡Mañana es el cumpleaños! 🎉</span>
+                  ) : (
+                    <span className="font-semibold">Faltan {timeLeft.days} días</span>
+                  )} para celebrar
                 </p>
               </div>
             </div>
