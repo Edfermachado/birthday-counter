@@ -30,32 +30,33 @@ export default function BirthdayCounter({ name, birthDate }: BirthdayCounterProp
     const birthMonth = birthDate.getMonth();
     const birthDay = birthDate.getDate();
 
-    // ❗ FECHA OBJETIVO FIJA A LAS 12:00 PM
+    // ✅ FECHA OBJETIVO EXACTA A 00:00:00 (sin errores de horas)
     let targetDate = new Date(
       now.getFullYear(),
       birthMonth,
       birthDay,
-      12, 0, 0, 0
+      0, 0, 0, 0
     );
 
-    // ❗ SI YA PASÓ ESTE AÑO → SALTAR AL SIGUIENTE
-    if (now > targetDate) {
+    // Si ya pasó este día → saltar al próximo año
+    if (now.getTime() > targetDate.getTime()) {
       targetDate = new Date(
         now.getFullYear() + 1,
         birthMonth,
         birthDay,
-        12, 0, 0, 0
+        0, 0, 0, 0
       );
     }
 
     const diff = targetDate.getTime() - now.getTime();
 
+    // ⛔ NADA de 17 horas incorrectas: cálculo exacto
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
 
-    const isToday = diff > 0 && diff <= 24 * 60 * 60 * 1000;
+    const isToday = days === 0;
 
     setTimeLeft({
       days,
@@ -72,18 +73,15 @@ export default function BirthdayCounter({ name, birthDate }: BirthdayCounterProp
     return () => clearInterval(timer);
   }, [birthDate]);
 
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString("es-ES", {
+  const formatDate = (date: Date) =>
+    date.toLocaleDateString("es-ES", {
       weekday: "long",
       year: "numeric",
       month: "long",
       day: "numeric",
     });
-  };
 
-  if (!isClient) {
-    return <div>Cargando...</div>;
-  }
+  if (!isClient) return <div>Cargando...</div>;
 
   return (
     <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-10 mb-8">
@@ -92,7 +90,6 @@ export default function BirthdayCounter({ name, birthDate }: BirthdayCounterProp
           Próximo cumpleaños de {name}
         </h2>
 
-        {/* ❗ AQUÍ PARA DE MOSTRAR 11 */}
         <p className="text-lg text-gray-600 mt-2">
           {formatDate(timeLeft.targetDate)}
         </p>
