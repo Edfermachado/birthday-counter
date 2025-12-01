@@ -8,71 +8,54 @@ interface BirthdayCounterProps {
 }
 
 export default function BirthdayCounter({ name, birthDate }: BirthdayCounterProps) {
-  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0, isToday: false, targetDate: new Date() });
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
-  }, []);
+    calculateTime();
+  }, [birthDate]);
 
-  function calculateTimeLeft() {
+  function calculateTime() {
     const now = new Date();
     
-    // Obtener año actual
-    const currentYear = now.getFullYear();
+    // Obtener día y mes del cumpleaños
+    const birthMonth = birthDate.getMonth();
+    const birthDay = birthDate.getDate();
     
-    // Crear fecha de cumpleaños para ESTE AÑO en la zona horaria local
-    let nextBirthday = new Date(
-      currentYear,
-      birthDate.getMonth(),
-      birthDate.getDate(),
-      0, 0, 0, 0  // Medianoche
-    );
+    // Crear fecha objetivo para ESTE AÑO
+    let targetDate = new Date(now.getFullYear(), birthMonth, birthDay, 0, 0, 0, 0);
     
-    // Si el cumpleaños YA PASÓ este año, usar el próximo año
-    if (now > nextBirthday) {
-      nextBirthday = new Date(
-        currentYear + 1,
-        birthDate.getMonth(),
-        birthDate.getDate(),
-        0, 0, 0, 0
-      );
+    // Si ya pasó este año, usar próximo año
+    if (now > targetDate) {
+      targetDate = new Date(now.getFullYear() + 1, birthMonth, birthDay, 0, 0, 0, 0);
     }
     
     // Calcular diferencia en milisegundos
-    const difference = nextBirthday.getTime() - now.getTime();
+    const diff = targetDate.getTime() - now.getTime();
     
-    // Si la diferencia es positiva (aún no es el cumpleaños)
-    if (difference > 0) {
-      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-      
-      return {
-        days,
-        hours,
-        minutes,
-        seconds,
-        nextBirthday,
-        isToday: false,
-      };
-    }
+    // Calcular días, horas, minutos, segundos
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
     
-    // Si la diferencia es <= 0, es HOY el cumpleaños
-    return {
-      days: 0,
-      hours: 0,
-      minutes: 0,
-      seconds: 0,
-      nextBirthday,
-      isToday: true,
-    };
+    // Es hoy si queda menos de 24 horas
+    const isToday = diff > 0 && diff <= 24 * 60 * 60 * 1000;
+    
+    setTimeLeft({
+      days,
+      hours,
+      minutes,
+      seconds,
+      isToday,
+      targetDate,
+    });
   }
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setTimeLeft(calculateTimeLeft());
+      calculateTime();
     }, 1000);
 
     return () => clearInterval(timer);
@@ -101,13 +84,6 @@ export default function BirthdayCounter({ name, birthDate }: BirthdayCounterProp
     );
   }
 
-  // Calcular fecha para mostrar (sin horas/minutos/segundos)
-  const displayDate = new Date(
-    timeLeft.nextBirthday.getFullYear(),
-    timeLeft.nextBirthday.getMonth(),
-    timeLeft.nextBirthday.getDate()
-  );
-
   return (
     <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-10 mb-8">
       <div className="text-center mb-8">
@@ -124,7 +100,7 @@ export default function BirthdayCounter({ name, birthDate }: BirthdayCounterProp
           )}
         </h2>
         <p className="text-lg text-gray-600 mt-2">
-          {formatDate(displayDate)}
+          {formatDate(timeLeft.targetDate)}
         </p>
         <p className="text-sm text-gray-500 mt-2">
           Zona horaria: {Intl.DateTimeFormat().resolvedOptions().timeZone}
@@ -156,9 +132,14 @@ export default function BirthdayCounter({ name, birthDate }: BirthdayCounterProp
                 <p className="text-lg text-gray-700">
                   {timeLeft.days === 1 ? (
                     <span className="font-semibold">¡Mañana es el cumpleaños! 🎉</span>
+                  ) : timeLeft.days === 0 ? (
+                    <span className="font-semibold">¡Hoy es el cumpleaños! 🎂</span>
                   ) : (
                     <span className="font-semibold">Faltan {timeLeft.days} días</span>
                   )} para celebrar
+                </p>
+                <p className="text-sm text-gray-500 mt-1">
+                  {timeLeft.days === 10 ? "¡Exactamente 10 días!" : ""}
                 </p>
               </div>
             </div>

@@ -1,21 +1,20 @@
 import BirthdayCounter from "@/components/BirthdayCounter";
 
 export default function Home() {
-  // Configura aquí la fecha de cumpleaños (año, mes, día)
-  // IMPORTANTE: Usar UTC para evitar problemas de zona horaria
+  // CORREGIDO: 12 de diciembre 2025
   const birthday = {
-    name: "Hola quiero tira'",
-    // Crea la fecha en UTC (mes 0-11, donde 0=Enero, 11=Diciembre)
-    date: new Date(Date.UTC(2025, 11, 12)), // 12 de diciembre 2025 en UTC
+    name: "Mi Amigo",
+    // 12 de diciembre 2025 (mes 11 porque empieza en 0)
+    date: new Date(2025, 11, 12), // ¡Corregido a 12!
   };
 
-  // Función para formatear fecha para mostrar
-  const formatBirthday = (date: Date) => {
+  // Solo para mostrar info
+  const formatDate = (date: Date) => {
     return date.toLocaleDateString("es-ES", {
+      weekday: "long",
       year: "numeric",
       month: "long",
       day: "numeric",
-      timeZone: "UTC"
     });
   };
 
@@ -45,7 +44,10 @@ export default function Home() {
               <strong>Nombre:</strong> {birthday.name}
             </p>
             <p>
-              <strong>Fecha de cumpleaños:</strong> {formatBirthday(birthday.date)}
+              <strong>Fecha de cumpleaños:</strong> {formatDate(birthday.date)}
+            </p>
+            <p>
+              <strong>Día específico:</strong> 12 de diciembre 2025
             </p>
             <div className="pt-4">
               <h3 className="font-bold mb-2">Para cambiar la fecha:</h3>
@@ -53,22 +55,29 @@ export default function Home() {
 {`// En src/app/page.tsx, cambia esta línea:
 const birthday = {
   name: "Nombre de tu amigo",
-  date: new Date(Date.UTC(año, mes-1, día)),
+  date: new Date(año, mes-1, día), // ¡RECUERDA: mes empieza en 0!
 };
 
-// Ejemplo para 25 de diciembre 2025:
-date: new Date(Date.UTC(2025, 11, 25))
+// Ejemplo para 12 de diciembre 2025:
+date: new Date(2025, 11, 12)
 
-// Los meses van de 0 a 11 (0=Enero, 11=Diciembre)`}
+// Ejemplo para 25 de diciembre 2025:
+date: new Date(2025, 11, 25)
+
+// ¡LOS MESES VAN DE 0 A 11!
+// 0 = Enero, 1 = Febrero, ..., 11 = Diciembre`}
               </pre>
             </div>
           </div>
         </div>
 
-        <footer className="mt-12 text-center text-gray-500 text-sm">
-          <p>Desplegado en Vercel • Se actualiza automáticamente cada segundo</p>
-          <p className="mt-2">Tiempo actual del servidor: {new Date().toUTCString()}</p>
-        </footer>
+        // En el footer de page.tsx, añade:
+<footer className="mt-12 text-center text-gray-500 text-sm">
+  <p>Hoy es: {new Date().toLocaleDateString("es-ES")}</p>
+  <p>Fecha configurada: {birthday.date.toLocaleDateString("es-ES")}</p>
+  <p>Diferencia calculada: {Math.floor((birthday.date.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} días</p>
+  <p className="mt-2">Desplegado en Vercel • Se actualiza automáticamente</p>
+</footer>
       </div>
     </main>
   );
