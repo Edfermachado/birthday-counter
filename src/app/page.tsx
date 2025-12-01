@@ -1,14 +1,12 @@
 import BirthdayCounter from "@/components/BirthdayCounter";
 
 export default function Home() {
-  // CORREGIDO: 12 de diciembre 2025
+  // Fecha corregida usando mediodía
   const birthday = {
     name: "Mi Amigo",
-    // 12 de diciembre 2025 (mes 11 porque empieza en 0)
-    date: new Date(2025, 11, 12), // ¡Corregido a 12!
+    date: new Date(2025, 11, 12, 12, 0, 0), // <-- MEDIODÍA, evita desfases
   };
 
-  // Solo para mostrar info
   const formatDate = (date: Date) => {
     return date.toLocaleDateString("es-ES", {
       weekday: "long",
@@ -40,44 +38,31 @@ export default function Home() {
             📝 Información del cumpleaños
           </h2>
           <div className="space-y-4 text-gray-600">
-            <p>
-              <strong>Nombre:</strong> {birthday.name}
-            </p>
-            <p>
-              <strong>Fecha de cumpleaños:</strong> {formatDate(birthday.date)}
-            </p>
-            <p>
-              <strong>Día específico:</strong> 12 de diciembre 2025
-            </p>
+            <p><strong>Nombre:</strong> {birthday.name}</p>
+            <p><strong>Fecha de cumpleaños:</strong> {formatDate(birthday.date)}</p>
+            <p><strong>Día específico:</strong> 12 de diciembre 2025</p>
+
             <div className="pt-4">
               <h3 className="font-bold mb-2">Para cambiar la fecha:</h3>
               <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm">
-{`// En src/app/page.tsx, cambia esta línea:
-const birthday = {
-  name: "Nombre de tu amigo",
-  date: new Date(año, mes-1, día), // ¡RECUERDA: mes empieza en 0!
-};
-
-// Ejemplo para 12 de diciembre 2025:
-date: new Date(2025, 11, 12)
-
-// Ejemplo para 25 de diciembre 2025:
-date: new Date(2025, 11, 25)
-
-// ¡LOS MESES VAN DE 0 A 11!
-// 0 = Enero, 1 = Febrero, ..., 11 = Diciembre`}
+{`// Recuerda: usa mediodía para evitar desfase
+date: new Date(2025, 11, 12, 12, 0, 0)`}
               </pre>
             </div>
           </div>
         </div>
 
-        // En el footer de page.tsx, añade:
-<footer className="mt-12 text-center text-gray-500 text-sm">
-  <p>Hoy es: {new Date().toLocaleDateString("es-ES")}</p>
-  <p>Fecha configurada: {birthday.date.toLocaleDateString("es-ES")}</p>
-  <p>Diferencia calculada: {Math.floor((birthday.date.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} días</p>
-  <p className="mt-2">Desplegado en Vercel • Se actualiza automáticamente</p>
-</footer>
+        <footer className="mt-12 text-center text-gray-500 text-sm">
+          <p>Hoy es: {new Date().toLocaleDateString("es-ES")}</p>
+          <p>Fecha configurada: {birthday.date.toLocaleDateString("es-ES")}</p>
+          <p>Diferencia calculada: {
+            Math.floor(
+              (birthday.date.getTime() - new Date().getTime()) /
+              (1000 * 60 * 60 * 24)
+            )
+          } días</p>
+          <p className="mt-2">Desplegado en Vercel • Se actualiza automáticamente</p>
+        </footer>
       </div>
     </main>
   );
