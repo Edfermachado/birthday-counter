@@ -26,44 +26,27 @@ export default function BirthdayCounter({ name, birthDate }: BirthdayCounterProp
 
   function calculateTime() {
     const now = new Date();
-
     const birthMonth = birthDate.getMonth();
     const birthDay = birthDate.getDate();
 
-    // ✅ FECHA OBJETIVO EXACTA A 00:00:00 (sin errores de horas)
-    let targetDate = new Date(
-      now.getFullYear(),
-      birthMonth,
-      birthDay,
-      0, 0, 0, 0
-    );
+    let targetDate = new Date(now.getFullYear(), birthMonth, birthDay, 0, 0, 0, 0);
 
-    // Si ya pasó este día → saltar al próximo año
     if (now.getTime() > targetDate.getTime()) {
-      targetDate = new Date(
-        now.getFullYear() + 1,
-        birthMonth,
-        birthDay,
-        0, 0, 0, 0
-      );
+      targetDate = new Date(now.getFullYear() + 1, birthMonth, birthDay, 0, 0, 0, 0);
     }
 
     const diff = targetDate.getTime() - now.getTime();
-
-    // ⛔ NADA de 17 horas incorrectas: cálculo exacto
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
     const minutes = Math.floor((diff / (1000 * 60)) % 60);
     const seconds = Math.floor((diff / 1000) % 60);
-
-    const isToday = days === 0;
 
     setTimeLeft({
       days,
       hours,
       minutes,
       seconds,
-      isToday,
+      isToday: days === 0,
       targetDate
     });
   }
@@ -84,17 +67,22 @@ export default function BirthdayCounter({ name, birthDate }: BirthdayCounterProp
   if (!isClient) return <div>Cargando...</div>;
 
   return (
-    <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-10 mb-8">
+    <div className="
+      backdrop-blur-xl bg-white/5 
+      border border-white/10 
+      rounded-3xl shadow-[0_0_20px_rgba(255,255,255,0.1)]
+      p-6 md:p-10 mb-8
+    ">
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-800">
+        <h2 className="text-3xl font-bold text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">
           Próximo cumpleaños de {name}
         </h2>
 
-        <p className="text-lg text-gray-600 mt-2">
+        <p className="text-lg text-gray-300 mt-2">
           {formatDate(timeLeft.targetDate)}
         </p>
 
-        <p className="text-sm text-gray-500 mt-2">
+        <p className="text-sm text-gray-400 mt-2">
           Zona horaria: {Intl.DateTimeFormat().resolvedOptions().timeZone}
         </p>
       </div>
@@ -111,11 +99,18 @@ export default function BirthdayCounter({ name, birthDate }: BirthdayCounterProp
 
 function TimeUnit({ value, label }: { value: number; label: string }) {
   return (
-    <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-4 text-white">
-      <div className="text-4xl font-bold mb-2">
+    <div className="
+      bg-gradient-to-br from-purple-600 to-blue-600 
+      rounded-2xl p-4 text-white 
+      shadow-[0_0_12px_rgba(99,102,241,0.6)]
+      border border-white/10
+    ">
+      <div className="text-4xl font-extrabold mb-2 tracking-wide drop-shadow-lg">
         {value.toString().padStart(2, "0")}
       </div>
-      <div className="text-sm font-semibold tracking-wider">{label}</div>
+      <div className="text-sm font-semibold tracking-wider opacity-90">
+        {label}
+      </div>
     </div>
   );
 }
