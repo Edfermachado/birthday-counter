@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Contador de Cumpleaños",
+  title: "Cumpleaños del Hola Quiero Tira'",
   description: "Cuenta regresiva para el próximo cumpleaños",
 };
 
