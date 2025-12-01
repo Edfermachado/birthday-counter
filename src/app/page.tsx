@@ -4,9 +4,9 @@ export default function Home() {
   // Configura aquí la fecha de cumpleaños (año, mes, día)
   // IMPORTANTE: Usar UTC para evitar problemas de zona horaria
   const birthday = {
-    name: "Mi Amigo",
+    name: "Hola quiero tira'",
     // Crea la fecha en UTC (mes 0-11, donde 0=Enero, 11=Diciembre)
-    date: new Date(Date.UTC(2025, 7, 15)), // 15 de agosto 2025 en UTC
+    date: new Date(Date.UTC(2025, 11, 12)), // 12 de diciembre 2025 en UTC
   };
 
   // Función para formatear fecha para mostrar
